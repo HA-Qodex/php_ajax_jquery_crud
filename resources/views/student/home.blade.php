@@ -52,35 +52,54 @@
                 </div>
                 <div class="modal-body">
                     <ul id="updateErrorList" style="padding-left: 20px "></ul>
-                    <input type="hidden" class="student_id">
+                    <input type="hidden" id="student_id">
                     <div class="form-group">
                         <label for="">Name</label>
-                        <input type="text" class="name form-control" name="name">
+                        <input type="text" id="name" class="form-control" name="name">
                     </div>
 
                     <div class="form-group">
                         <label for="">Email</label>
-                        <input type="email" class="email form-control" name="email">
+                        <input type="email" id="email" class="form-control" name="email">
                     </div>
 
                     <div class="form-group">
                         <label for="">Phone</label>
-                        <input type="number" class="phone form-control" name="phone">
+                        <input type="number" id="phone" class="form-control" name="phone">
                     </div>
 
                     <div class="form-group">
                         <label for="">Course</label>
-                        <input type="text" class="course form-control" name="course">
+                        <input type="text" id="course" class="form-control" name="course">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary update_student">Update Student</button>
+                    <button type="button" class="btn btn-primary " id="update_student">Update Student</button>
                 </div>
             </div>
         </div>
     </div>
-
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteStudentModal" tabindex="-1" aria-labelledby="DeleteModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="user_id">
+                    <span>Do you really want to delete </span>
+                    <span style="font-weight: bold; font-size: 16px" id="deleteName"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger " id="deleteButton">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container py-3">
         <div class="row">
@@ -124,22 +143,22 @@
 
             fetchStudent();
 
-            function fetchStudent(){
+            function fetchStudent() {
                 $.ajax({
-                    type:'GET',
-                    url:'/fetch',
-                    dataType:'json',
-                    success: function (response){
+                    type: 'GET',
+                    url: '/fetch',
+                    dataType: 'json',
+                    success: function (response) {
                         $('tbody').html('');
                         $.each(response.students, function (key, data) {
                             $('tbody').append('<tr>\
-                                <td>'+data.id+'</td>\
-                                <td>'+data.name+'</td>\
-                                <td>'+data.email+'</td>\
-                                <td>'+data.phone+'</td>\
-                                <td>'+data.course+'</td>\
-                                <td style="text-align: center; display:flex; justify-content: space-evenly"><button type="button" value="'+data.id+'" class="edit_student btn btn-primary btn-sm text-center">Edit</button>\<' +
-                                'button type="button" value="'+data.id+'" class="delete_student btn btn-danger btn-sm text-center">Delete</button></td>\
+                                <td>' + data.id + '</td>\
+                                <td>' + data.name + '</td>\
+                                <td>' + data.email + '</td>\
+                                <td>' + data.phone + '</td>\
+                                <td>' + data.course + '</td>\
+                                <td style="text-align: center; display:flex; justify-content: space-evenly"><button type="button" value="' + data.id + '" id="edit_student" class="btn btn-primary btn-sm text-center">Edit</button>\<' +
+                                'button type="button" value="' + data.id + '" id="delete_student" class="btn btn-danger btn-sm text-center">Delete</button></td>\
                                 </tr>');
                         })
                     }
@@ -147,43 +166,43 @@
                 });
             }
 
-            $(document).on('click', '.edit_student', function (e){
+            $(document).on('click', '#edit_student', function (e) {
                 e.preventDefault();
                 const student_id = $(this).val();
 
                 $('#EditStudentModal').modal('show');
 
                 $.ajax({
-                   type:'GET',
-                   url:'/edit-student/'+student_id,
-                   success: function (response){
-                       if(response.message===400){
-                           $('#successMessage').html('');
-                           $('#successMessage').addClass('alert alert-danger');
-                           $('#successMessage').text(response.message);
-                       } else {
-                           $('#EditStudentModal').modal('show');
-                           $('.student_id').val(response.student.id);
-                           $('.name').val(response.student.name);
-                           $('.email').val(response.student.email);
-                           $('.phone').val(response.student.phone);
-                           $('.course').val(response.student.course);
-                       }
-                   }
+                    type: 'GET',
+                    url: '/edit-student/' + student_id,
+                    success: function (response) {
+                        if (response.message === 400) {
+                            $('#successMessage').html('');
+                            $('#successMessage').addClass('alert alert-danger');
+                            $('#successMessage').text(response.message);
+                        } else {
+                            $('#EditStudentModal').modal('show');
+                            $('#student_id').val(response.student.id);
+                            $('#name').val(response.student.name);
+                            $('#email').val(response.student.email);
+                            $('#phone').val(response.student.phone);
+                            $('#course').val(response.student.course);
+                        }
+                    }
                 });
             });
 
-            $(document).on('click','.update_student', function (e){
-             e.preventDefault();
+            $(document).on('click', '#update_student', function (e) {
+                e.preventDefault();
 
-             const student_id = $('.student_id').val();
+                const student_id = $('#student_id').val();
 
-             const data = {
-                 'name': $('.name').val(),
-                 'email': $('.email').val(),
-                 'phone': $('.phone').val(),
-                 'course': $('.course').val(),
-             }
+                const data = {
+                    'name': $('#name').val(),
+                    'email': $('#email').val(),
+                    'phone': $('#phone').val(),
+                    'course': $('#course').val(),
+                }
 
                 $.ajaxSetup({
                     headers: {
@@ -193,29 +212,75 @@
 
 
                 $.ajax({
-                 type: "PUT",
-                 url: "/update-student/"+student_id,
-                 data: data,
-                 dataType: "json",
-                 success: function (response) {
-                     if(response.status===400) {
-                         $("#errorList").html("");
-                         $('#errorList').addClass('alert alert-danger');
-                         $.each(response.errors, function (key, error_value) {
-                             $('#errorList').append('<li>' + error_value + '</li>');
-                         })
-                     } else {
-                         $('#successMessage').html('');
-                         $('#successMessage').addClass('alert alert-success');
-                         $('#successMessage').text(response.message);
-                         $('#EditStudentModal').modal('hide');
-                         $('#EditStudentModal').find('input').val('');
-                         fetchStudent();
-                     }
-                 }
-             });
+                    type: "PUT",
+                    url: "/update-student/" + student_id,
+                    data: data,
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if (response.status === 400) {
+                            $("#updateErrorList").html("");
+                            $('#updateErrorList').addClass('alert alert-danger');
+                            $.each(response.errors, function (key, error_value) {
+                                $('#updateErrorList').append('<li>' + error_value + '</li>');
+                            })
+                        } else {
+                            $('#successMessage').html('');
+                            $('#successMessage').addClass('alert alert-success');
+                            $('#successMessage').text(response.message);
+                            $('#EditStudentModal').modal('hide');
+                            $('#EditStudentModal').find('input').val('');
+                            fetchStudent();
+                        }
+                    }
+                });
 
             });
+
+            $(document).on('click', '#delete_student', function (e) {
+                e.preventDefault();
+                const student_id = $(this).val();
+                $('#user_id').val(student_id);
+                $('#deleteStudentModal').modal('show');
+
+                $.ajax({
+                    type:'GET',
+                    url: '/student-info/'+student_id,
+                    success: function (response) {
+                        if(response.status===200){
+                            $("#deleteName").text(response.data+"?");
+                        }
+                    }
+                });
+            });
+
+            $(document).on('click', '#deleteButton', function (e) {
+                e.preventDefault();
+                const student_id = $('#user_id').val();
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                    $.ajax({
+                    type: 'DELETE',
+                    url: '/delete-student/' + student_id,
+                    success: function (response) {
+                        console.log(response.status)
+                        if (response.status === 200) {
+                            $('#deleteStudentModal').modal('hide');
+                            $('#successMessage').html('');
+                            $('#successMessage').addClass('alert alert-success');
+                            $('#successMessage').text(response.message);
+                            fetchStudent();
+
+                        }
+                    }
+                })
+
+            })
 
             $(document).on('click', '.add_student', function (e) {
                 e.preventDefault();

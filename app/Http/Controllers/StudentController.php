@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
-use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -74,8 +73,6 @@ class StudentController extends Controller
     public function update(Request $request, $id)
     {
 
-        dd($request);
-
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:191',
             'email' => 'required|email|max:191',
@@ -83,36 +80,49 @@ class StudentController extends Controller
             'course' => 'required|max:191',
         ]);
 
-        if ($validator->fails()) {
+        if (!$validator->fails()) {
+
+
+            $student = Student::find($id);
+
+
+            $student->name = $request->input('name');
+            $student->email = $request->input('email');
+            $student->phone = $request->input('phone');
+            $student->course = $request->input('course');
+            $student->update();
 
             return response()->json([
-                    'status' => 200,
-                    'message' => 'Student updated successfully!',
-                ]);
-
-//            $student = Student::find($id);
-//
-//            if($student){
-//                $student->name = $request->input('name');
-//                $student->email = $request->input('email');
-//                $student->phone = $request->input('phone');
-//                $student->course = $request->input('course');
-//                $student->update();
-//                return response()->json([
-//                    'status' => 200,
-//                    'message' => 'Student updated successfully!',
-//                ]);
-//            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'errors' => $validator->messages(),
+                'status' => 200,
+                'message' => 'Student updated successfully!',
             ]);
+
         }
+
+        return response()->json([
+            'status' => 400,
+            'errors' => $validator->messages(),
+        ]);
     }
 
-    public function destroy(Student $student)
+    public function getStudent($id)
     {
-        //
+        $student = Student::find($id)->name;
+        return response()->json([
+            'status' => 200,
+            'data' => $student,
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $student = Student::find($id);
+        $name = Student::find($id)->name;
+        $student->delete();
+        return response()->json([
+            'status' => 200,
+            'message' => "$name deleted successfully",
+        ]);
+
     }
 }
